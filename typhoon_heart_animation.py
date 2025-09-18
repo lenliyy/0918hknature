@@ -5,7 +5,7 @@ from matplotlib import cm
 from matplotlib.colors import to_hex
 import random
 
-# 台风数据
+# Typhoon data from 2002 to 2023
 typhoon_data = {
     2002: 6, 2003: 7, 2004: 5, 2005: 8, 2006: 7, 2007: 9, 2008: 6, 2009: 5,
     2010: 7, 2011: 8, 2012: 6, 2013: 7, 2014: 5, 2015: 8, 2016: 7, 2017: 9,
@@ -13,12 +13,12 @@ typhoon_data = {
 }
 
 def heart_shape(t, scale=1.0):
-    """心型公式"""
+    """Heart shape formula"""
     r = scale * (2 - 2 * np.sin(t) + np.sin(t) * np.sqrt(np.abs(np.cos(t))) / (np.sin(t) + 1.4))
     return r
 
 def generate_stars(num_stars, min_x=-2.2, max_x=2.2, min_y=-2.2, max_y=2.2):
-    """生成星星数据"""
+    """Generate background stars data"""
     x = [random.uniform(min_x, max_x) for _ in range(num_stars)]
     y = [random.uniform(min_y, max_y) for _ in range(num_stars)]
     sizes = [random.uniform(2, 7) for _ in range(num_stars)]
@@ -27,7 +27,7 @@ def generate_stars(num_stars, min_x=-2.2, max_x=2.2, min_y=-2.2, max_y=2.2):
     return x, y, sizes, colors
 
 def generate_heart_stars(num_stars):
-    """生成心形内部的星星"""
+    """Generate stars inside the heart shape"""
     x, y, sizes, colors = [], [], [], []
     for _ in range(num_stars):
         t = random.uniform(0, 2*np.pi)
@@ -40,26 +40,26 @@ def generate_heart_stars(num_stars):
     return x, y, sizes, colors
 
 def create_visualization():
-    # 基本参数设置
+    # Basic parameter settings
     num_points = 200
     theta = np.linspace(0, 2 * np.pi, num_points, endpoint=False)
     years = list(typhoon_data.keys())
     counts = np.array(list(typhoon_data.values()))
     
-    # 生成渐变色
+    # Generate gradient colors
     purples = cm.get_cmap('Purples')
     num_layers = len(typhoon_data)
     layer_colors = [to_hex(purples(0.4 + 0.6*i/max(num_layers-1,1))) for i in range(num_layers)]
     
-    # 计算缩放比例
+    # Calculate scaling ratios
     min_scale, max_scale = 0.7, 1.3
     scales = min_scale + (counts - min(counts)) / (max(counts) - min(counts) + 1e-6) * (max_scale - min_scale)
     
-    # 生成背景星星和心形内部星星
+    # Generate background stars and heart-shaped stars
     bg_x, bg_y, bg_sizes, bg_colors = generate_stars(120)
     heart_x, heart_y, heart_sizes, heart_colors = generate_heart_stars(60)
     
-    # 创建动画帧
+    # Create animation frames
     frames = []
     num_frames = 60
     
@@ -68,7 +68,7 @@ def create_visualization():
         cos_a, sin_a = np.cos(angle), np.sin(angle)
         data = []
         
-        # 添加背景星星
+        # Add background stars
         data.append(go.Scatter(
             x=bg_x, y=bg_y,
             mode='markers',
@@ -78,7 +78,7 @@ def create_visualization():
             showlegend=False
         ))
         
-        # 添加心形内部星星
+        # Add heart-shaped internal stars
         data.append(go.Scatter(
             x=heart_x, y=heart_y,
             mode='markers',
@@ -88,7 +88,7 @@ def create_visualization():
             showlegend=False
         ))
         
-        # 添加多层心形
+        # Add multi-layer heart shapes
         for i, (scale, color, year, count) in enumerate(zip(scales, layer_colors, years, counts)):
             r = heart_shape(theta, scale)
             x = r * np.sin(theta)
@@ -106,7 +106,7 @@ def create_visualization():
                 showlegend=False
             ))
         
-        # 添加年份标记点
+        # Add year markers
         r = heart_shape(theta, scales[-1])
         x = r * np.sin(theta)
         y = r * np.cos(theta)
@@ -124,7 +124,7 @@ def create_visualization():
                 line=dict(width=2, color='white'),
                 opacity=0.95
             ),
-            text=[f'{y}年<br>台风:{c}' for y, c in zip(years, counts)],
+            text=[f'Year {y}<br>Typhoons: {c}' for y, c in zip(years, counts)],
             textposition='top center',
             hoverinfo='text',
             showlegend=False
@@ -132,9 +132,9 @@ def create_visualization():
         
         frames.append(go.Frame(data=data, name=str(f)))
     
-    # 创建初始布局
+    # Create initial layout
     layout = go.Layout(
-        title='2002-2023年香港台风历年数据 - 星空心型渐变旋转动画',
+        title='Hong Kong Typhoon Data Visualization (2002-2023) - Animated Heart Shape',
         xaxis=dict(visible=False, range=[-2.5, 2.5]),
         yaxis=dict(visible=False, range=[-2.5, 2.5]),
         showlegend=False,
@@ -145,7 +145,7 @@ def create_visualization():
             type='buttons',
             showactive=False,
             buttons=[dict(
-                label='播放',
+                label='Play',
                 method='animate',
                 args=[None, {'frame': {'duration': 80, 'redraw': True},
                             'fromcurrent': True}]
@@ -153,7 +153,7 @@ def create_visualization():
         )]
     )
     
-    # 创建图表
+    # Create figure
     fig = go.Figure(
         data=frames[0].data,
         layout=layout,
