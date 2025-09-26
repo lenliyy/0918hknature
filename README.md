@@ -11,7 +11,7 @@ This is an interactive fluid animation visualization project showcasing Hong Kon
 
 ## 🚀 How to Run
 1. Install dependencies: `pip install -r requirements.txt`
-2. Run the program: `python typhoon_space_flow_animation_en.py`
+2. Run the program: `python typhoon_space_flow_animation.py`
 3. Browser will automatically open the interactive visualization interface
 
 ## 🎮 Interaction Guide
